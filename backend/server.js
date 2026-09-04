@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 
+const authRoutes = require("./routes/authRoutes");
+
 dotenv.config();
 
 const app = express();
@@ -29,6 +31,9 @@ app.get("/api/health", (req, res) => {
     message: "LankaExplore backend is healthy.",
   });
 });
+
+// Routes
+app.use("/api/auth", authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
