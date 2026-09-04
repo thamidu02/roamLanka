@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-
+import placeRoutes from "./routes/placeRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -16,6 +16,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/api/places", placeRoutes);
 
 app.get("/", (req, res) => {
   res.json({
