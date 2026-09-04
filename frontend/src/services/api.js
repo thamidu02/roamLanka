@@ -88,3 +88,37 @@ export async function updateEvent(id, data) {
 export async function deleteEvent(id) {
   return apiRequest("DELETE", `/events/${id}`);
 }
+
+// ── Trips and trip items ────────────────────────────────────────────────────
+export async function getMyTrip() {
+  return apiRequest("GET", "/trips/my-trip");
+}
+
+export async function createTrip(data) {
+  return apiRequest("POST", "/trips", data);
+}
+
+export async function updateTrip(id, data) {
+  return apiRequest("PUT", `/trips/${id}`, data);
+}
+
+export async function deleteTrip(id) {
+  return apiRequest("DELETE", `/trips/${id}`);
+}
+
+export async function getTripItems(tripId) {
+  const result = await apiRequest("GET", `/trip-items/trip/${tripId}`);
+  return result.data || [];
+}
+
+export async function createTripItem(data) {
+  return apiRequest("POST", "/trip-items", data);
+}
+
+export async function updateTripItem(id, data) {
+  return apiRequest("PUT", `/trip-items/${id}`, data);
+}
+
+export async function deleteTripItem(id) {
+  return apiRequest("DELETE", `/trip-items/${id}`);
+}

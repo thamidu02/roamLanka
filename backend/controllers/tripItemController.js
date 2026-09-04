@@ -185,6 +185,14 @@ export const createTripItem = async (req, res) => {
       });
     }
 
+    const existingTripItem = await TripItem.findOne({ tripId, type, itemId });
+    if (existingTripItem) {
+      return res.status(409).json({
+        success: false,
+        message: "This item is already in your trip.",
+      });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Create Trip Item
