@@ -24,12 +24,7 @@ if (process.env.CLIENT_URL && !allowedOrigins.includes(process.env.CLIENT_URL)) 
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
-      "https://roam-lanka-b6dl.vercel.app",
-    ],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
@@ -92,7 +87,5 @@ if (!process.env.VERCEL) {
     });
   });
 }
-
-startServer();
 
 export default app;
