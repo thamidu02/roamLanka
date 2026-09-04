@@ -2,10 +2,12 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import eventRoutes from "./routes/eventRoutes.js";
 import placeRoutes from "./routes/placeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import hotelRoutes from "./routes/hotelRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
+import tripItemRoutes from "./routes/tripItemRoutes.js";
 
 dotenv.config();
 
@@ -21,11 +23,13 @@ app.use(
 
 app.use(express.json());
 
+app.use("/api/events", eventRoutes);
 // Routes
 app.use("/api/places", placeRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/trips", tripRoutes);
+app.use("/api/trip-items", tripItemRoutes);
 
 app.get("/", (req, res) => {
   res.json({
