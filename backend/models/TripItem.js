@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const tripItemSchema = new mongoose.Schema(
   {
@@ -46,4 +46,6 @@ const tripItemSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("TripItem", tripItemSchema);
+const TripItem = mongoose.model("TripItem", tripItemSchema);
+
+export default TripItem;
