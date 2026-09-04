@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
+const getJwtSecret = () => process.env.JWT_SECRET || "roamlanka_jwt_secret_fallback_2026";
+
 // Register a new user
 export const register = async (req, res) => {
   try {
@@ -47,7 +49,7 @@ export const register = async (req, res) => {
     console.error("Register error:", error);
 
     return res.status(500).json({
-      message: "Server error while registering user",
+      message: error.message || "Server error while registering user",
     });
   }
 };
@@ -91,7 +93,7 @@ export const login = async (req, res) => {
         userId: user._id,
         role: user.role,
       },
-      process.env.JWT_SECRET,
+      getJwtSecret(),
       {
         expiresIn: "1d",
       }
@@ -111,8 +113,9 @@ export const login = async (req, res) => {
     console.error("Login error:", error);
 
     return res.status(500).json({
-      message: "Server error while logging in",
+      message: error.message || "Server error while logging in",
     });
   }
 };
+
 

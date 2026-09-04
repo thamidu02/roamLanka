@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+const getJwtSecret = () => process.env.JWT_SECRET || "roamlanka_jwt_secret_fallback_2026";
+
 export const protect = (req, res, next) => {
   const authorization = req.headers.authorization;
 
@@ -8,7 +10,7 @@ export const protect = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(authorization.split(" ")[1], process.env.JWT_SECRET);
+    req.user = jwt.verify(authorization.split(" ")[1], getJwtSecret());
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token." });

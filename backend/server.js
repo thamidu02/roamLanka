@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -8,8 +8,6 @@ import hotelRoutes from "./routes/hotelRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
 import tripItemRoutes from "./routes/tripItemRoutes.js";
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,13 +24,12 @@ if (process.env.CLIENT_URL && !allowedOrigins.includes(process.env.CLIENT_URL)) 
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(null, true); // Alternatively allow all origins if preferred, or restrict
-    },
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "https://roam-lanka-b6dl.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -95,5 +92,7 @@ if (!process.env.VERCEL) {
     });
   });
 }
+
+startServer();
 
 export default app;
