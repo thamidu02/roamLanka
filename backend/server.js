@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import placeRoutes from "./routes/placeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import hotelRoutes from "./routes/hotelRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 // Routes
 app.use("/api/places", placeRoutes);
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/events", eventRoutes);
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
