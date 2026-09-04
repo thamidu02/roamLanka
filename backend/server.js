@@ -39,6 +39,27 @@ app.use(
 
 app.use(express.json());
 
+let isConnected = false;
+const connectDB = async () => {
+  if (isConnected || mongoose.connection.readyState >= 1) {
+    isConnected = true;
+    return;
+  }
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    isConnected = true;
+    console.log("MongoDB connected successfully.");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+  }
+};
+
+// Ensure DB is connected for serverless invocations
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
 // Routes
 app.use("/api/places", placeRoutes);
 app.use("/api/hotels", hotelRoutes);
@@ -66,18 +87,13 @@ app.use((req, res) => {
   });
 });
 
-const startServer = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB connected successfully.");
-
+// Only listen on port when running locally (not on Vercel)
+if (!process.env.VERCEL) {
+  connectDB().then(() => {
     app.listen(PORT, () => {
       console.log(`LankaExplore API is running on http://localhost:${PORT}`);
     });
-  } catch (error) {
-    console.error("MongoDB connection failed:", error.message);
-    process.exit(1);
-  }
-};
+  });
+}
 
-startServer();
+export default app;
