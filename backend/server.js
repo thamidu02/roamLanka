@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -9,8 +9,6 @@ import eventRoutes from "./routes/eventRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
 import tripItemRoutes from "./routes/tripItemRoutes.js";
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -20,6 +18,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "http://localhost:5175",
+      "https://roam-lanka-b6dl.vercel.app",
     ],
     credentials: true,
   })
@@ -69,3 +68,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+export default app;
