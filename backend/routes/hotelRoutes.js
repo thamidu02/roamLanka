@@ -8,42 +8,15 @@ import {
   deleteHotel,
 } from "../controllers/hotelController.js";
 
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-/*
- * GET /api/hotels
- * Get all hotels
- *
- * Examples:
- * /api/hotels
- * /api/hotels?location=Kandy
- * /api/hotels?search=Queen
- * /api/hotels?minPrice=5000&maxPrice=15000
- */
 router.get("/", getHotels);
-
-/*
- * GET /api/hotels/:id
- * Get one hotel
- */
 router.get("/:id", getHotelById);
 
-/*
- * POST /api/hotels
- * Create a hotel
- */
-router.post("/", createHotel);
-
-/*
- * PUT /api/hotels/:id
- * Update a hotel
- */
-router.put("/:id", updateHotel);
-
-/*
- * DELETE /api/hotels/:id
- * Delete a hotel
- */
-router.delete("/:id", deleteHotel);
+router.post("/", protect, adminOnly, createHotel);
+router.put("/:id", protect, adminOnly, updateHotel);
+router.delete("/:id", protect, adminOnly, deleteHotel);
 
 export default router;
