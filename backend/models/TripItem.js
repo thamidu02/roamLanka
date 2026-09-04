@@ -46,6 +46,4 @@ const tripItemSchema = new mongoose.Schema(
   }
 );
 
-const TripItem = mongoose.model("TripItem", tripItemSchema);
-
-export default TripItem;
+export default mongoose.model("TripItem", tripItemSchema);

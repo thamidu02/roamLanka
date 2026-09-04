@@ -55,8 +55,4 @@ const eventSchema = new mongoose.Schema(
   }
 );
 
-// Index to support efficient travel-date overlap queries:
-//   event.startDate <= tripEndDate AND event.endDate >= tripStartDate
-eventSchema.index({ startDate: 1, endDate: 1 });
-
 export default mongoose.model("Event", eventSchema);
