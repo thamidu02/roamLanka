@@ -83,7 +83,7 @@ function CrudModal({ title, fields, initial, onSave, onClose }) {
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             {fields.map((f) => {
-              if (f.row) return null; // handled in form-row
+              if (f.row) return null;
               return (
                 <div className="form-group" key={f.name}>
                   <label htmlFor={`field-${f.name}`}>{f.label}</label>
@@ -155,7 +155,7 @@ const HOTEL_FIELDS = [
   { name: "description", label: "Description", type: "textarea", required: true, placeholder: "Brief description of the hotel" },
   { name: "location", label: "Location", type: "select", required: true, options: ["Kandy", "Anuradhapura"] },
   { name: "pricePerNight", label: "Price Per Night (Rs.)", type: "number", required: true, min: 0, placeholder: "5000" },
-  { name: "rating", label: "Rating (0–5)", type: "number", min: 0, max: 5, step: "0.1", placeholder: "4.5" },
+  { name: "rating", label: "Rating (0-5)", type: "number", min: 0, max: 5, step: "0.1", placeholder: "4.5" },
   { name: "address", label: "Address", placeholder: "Street address (optional)" },
   { name: "imageUrl", label: "Image URL", placeholder: "https://... (optional)" },
 ];
@@ -181,8 +181,8 @@ function AdminResourceManager({
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState(null);       // null | { mode: "create" } | { mode: "edit", item }
-  const [confirmDelete, setConfirmDelete] = useState(null);  // null | item
+  const [modal, setModal] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -227,7 +227,6 @@ function AdminResourceManager({
 
   const prepareInitial = (item) => {
     const copy = { ...item };
-    // Format dates for date inputs
     if (copy.startDate) copy.startDate = copy.startDate.slice(0, 10);
     if (copy.endDate) copy.endDate = copy.endDate.slice(0, 10);
     return copy;
@@ -266,7 +265,7 @@ function AdminResourceManager({
       {loading ? (
         <div className="loading-state">
           <div className="spinner" />
-          <p>Loading {resourceName.toLowerCase()}s…</p>
+          <p>Loading {resourceName.toLowerCase()}s...</p>
         </div>
       ) : items.length === 0 ? (
         <div className="data-table-wrap">
@@ -298,10 +297,10 @@ function AdminResourceManager({
                   <td>
                     <div className="td-actions">
                       <button className="btn-edit" onClick={() => setModal({ mode: "edit", item })}>
-                        ✏️ Edit
+                        Edit
                       </button>
                       <button className="btn-delete" onClick={() => setConfirmDelete(item)}>
-                        🗑 Delete
+                        Delete
                       </button>
                     </div>
                   </td>
@@ -391,7 +390,7 @@ function UserBrowse({ resourceName, icon, fetchFn, renderCard, toast }) {
       {loading ? (
         <div className="loading-state">
           <div className="spinner" />
-          <p>Loading {resourceName.toLowerCase()}s…</p>
+          <p>Loading {resourceName.toLowerCase()}s...</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="empty-state">
@@ -440,17 +439,12 @@ const EVENT_COLUMNS = [
    MAIN APP
    ═══════════════════════════════════════════════════════════════════════════ */
 function App() {
-  // ── Auth state ──────────────────────────────────────────────────────────
   const [user, setUser] = useState(() =>
     JSON.parse(localStorage.getItem("lankaUser") || "null")
   );
-  const [authPage, setAuthPage] = useState("login"); // "login" | "register"
+  const [authPage, setAuthPage] = useState("login");
   const [authError, setAuthError] = useState("");
-
-  // ── Navigation ──────────────────────────────────────────────────────────
   const [activeSection, setActiveSection] = useState("places");
-
-  // ── Toasts ──────────────────────────────────────────────────────────────
   const [toasts, setToasts] = useState([]);
 
   const toast = useCallback((type, message) => {
@@ -465,11 +459,9 @@ function App() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // ── Auth handlers ───────────────────────────────────────────────────────
   const handleAuth = async (e) => {
     e.preventDefault();
     setAuthError("");
-
     const formData = Object.fromEntries(new FormData(e.currentTarget).entries());
 
     try {
@@ -503,7 +495,7 @@ function App() {
   };
 
   // ══════════════════════════════════════════════════════════════════════
-  //  NOT LOGGED IN → Show Login / Register
+  //  NOT LOGGED IN -> Show Login / Register
   // ══════════════════════════════════════════════════════════════════════
   if (!user) {
     const isLogin = authPage === "login";
@@ -580,25 +572,18 @@ function App() {
   }
 
   // ══════════════════════════════════════════════════════════════════════
-  //  LOGGED IN → Role-based dashboard
+  //  LOGGED IN -> Role-based dashboard
   // ══════════════════════════════════════════════════════════════════════
   const isAdmin = user.role === "admin";
 
-  const navItems = isAdmin
-    ? [
-        { id: "places", label: "Places", icon: "📍" },
-        { id: "hotels", label: "Hotels", icon: "🏨" },
-        { id: "events", label: "Events", icon: "🎭" },
-      ]
-    : [
-        { id: "places", label: "Places", icon: "📍" },
-        { id: "hotels", label: "Hotels", icon: "🏨" },
-        { id: "events", label: "Events", icon: "🎭" },
-      ];
+  const navItems = [
+    { id: "places", label: "Places", icon: "📍" },
+    { id: "hotels", label: "Hotels", icon: "🏨" },
+    { id: "events", label: "Events", icon: "🎭" },
+  ];
 
   const renderContent = () => {
     if (isAdmin) {
-      // ── Admin CRUD views ────────────────────────────────────────────
       switch (activeSection) {
         case "places":
           return (
@@ -649,7 +634,6 @@ function App() {
           return null;
       }
     } else {
-      // ── User browse views ──────────────────────────────────────────
       switch (activeSection) {
         case "places":
           return (
@@ -670,8 +654,8 @@ function App() {
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>
                     <div className="card-meta">
-                      <span>💰 Rs. {Number(item.estimatedCost).toLocaleString()}</span>
-                      <span>⏱ {item.estimatedDuration}h</span>
+                      <span>Rs. {Number(item.estimatedCost).toLocaleString()}</span>
+                      <span>{item.estimatedDuration}h</span>
                     </div>
                   </div>
                 </article>
@@ -696,8 +680,8 @@ function App() {
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>
                     <div className="card-meta">
-                      <span>💰 Rs. {Number(item.pricePerNight).toLocaleString()} / night</span>
-                      <span>⭐ {item.rating != null ? item.rating : "New"}</span>
+                      <span>Rs. {Number(item.pricePerNight).toLocaleString()} / night</span>
+                      <span>Rating: {item.rating != null ? item.rating : "New"}</span>
                     </div>
                   </div>
                 </article>
@@ -723,8 +707,8 @@ function App() {
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>
                     <div className="card-meta">
-                      <span>📅 {new Date(item.startDate).toLocaleDateString()} – {new Date(item.endDate).toLocaleDateString()}</span>
-                      <span>💰 Rs. {Number(item.estimatedCost || 0).toLocaleString()}</span>
+                      <span>{new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}</span>
+                      <span>Rs. {Number(item.estimatedCost || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 </article>
@@ -742,7 +726,6 @@ function App() {
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
 
       <div className="app-shell">
-        {/* ── Sidebar ───────────────────────────────────────────────── */}
         <aside className="sidebar">
           <div className="sidebar-brand">
             <h1>Roam<span>Lanka</span></h1>
@@ -773,12 +756,11 @@ function App() {
               </div>
             </div>
             <button className="logout-btn" onClick={logout}>
-              🚪 Log Out
+              Log Out
             </button>
           </div>
         </aside>
 
-        {/* ── Main Content ──────────────────────────────────────────── */}
         <main className="main-content">
           {renderContent()}
         </main>
