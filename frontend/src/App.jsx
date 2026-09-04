@@ -4,6 +4,7 @@ import {
   getPlaces, createPlace, updatePlace, deletePlace,
   getHotels, createHotel, updateHotel, deleteHotel,
   getEvents, createEvent, updateEvent, deleteEvent,
+  getMyTrip, createTrip, updateTrip, deleteTrip, getTripItems, createTripItem, deleteTripItem,
 } from "./services/api";
 import "./App.css";
 
@@ -435,6 +436,84 @@ const EVENT_COLUMNS = [
   { key: "estimatedCost", header: "Cost", render: (i) => `Rs. ${Number(i.estimatedCost || 0).toLocaleString()}` },
 ];
 
+function AddToTripButton({ item, type, toast }) {
+  const [adding, setAdding] = useState(false);
+  const add = async () => {
+    try {
+      setAdding(true);
+      let trip;
+      try { trip = (await getMyTrip()).data; }
+      catch (error) {
+        if (!error.message.toLowerCase().includes("no active trip")) throw error;
+        trip = (await createTrip({ name: "My LankaExplore Trip", destination: "Both", transportCost: 0 })).trip;
+      }
+      const cost = type === "hotel" ? item.pricePerNight : item.estimatedCost || 0;
+      await createTripItem({ tripId: trip._id, type, itemId: item._id, quantity: 1, estimatedCost: cost });
+      toast("success", `${item.name} was added to My Trip.`);
+    } catch (error) { toast("error", error.message); }
+    finally { setAdding(false); }
+  };
+  return <button className="btn-primary add-trip-btn" disabled={adding} onClick={add}>{adding ? "Adding…" : "+ Add to My Trip"}</button>;
+}
+
+function MyTrip({ toast }) {
+  const [trip, setTrip] = useState(null);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [transportCost, setTransportCost] = useState(0);
+
+  const loadTrip = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await getMyTrip();
+      setTrip(result.data);
+      setTransportCost(result.data.transportCost || 0);
+      setItems(await getTripItems(result.data._id));
+    } catch (error) {
+      if (!error.message.toLowerCase().includes("no active trip")) toast("error", error.message);
+      setTrip(null);
+      setItems([]);
+    } finally { setLoading(false); }
+  }, [toast]);
+
+  useEffect(() => { loadTrip(); }, [loadTrip]);
+
+  const makeTrip = async () => {
+    try {
+      setCreating(true);
+      const result = await createTrip({ name: "My LankaExplore Trip", destination: "Both", transportCost: 0 });
+      setTrip(result.trip);
+      setItems([]);
+      toast("success", "Your trip was created. Add places, hotels, or events next.");
+    } catch (error) { toast("error", error.message); }
+    finally { setCreating(false); }
+  };
+
+  const saveTransport = async () => {
+    if (!trip) return;
+    try {
+      const result = await updateTrip(trip._id, { transportCost: Number(transportCost || 0) });
+      setTrip(result.data);
+      toast("success", "Transport cost updated.");
+    } catch (error) { toast("error", error.message); }
+  };
+
+  const removeItem = async (id) => {
+    try {
+      await deleteTripItem(id);
+      setItems((current) => current.filter((item) => item._id !== id));
+      toast("success", "Item removed from your trip.");
+    } catch (error) { toast("error", error.message); }
+  };
+
+  if (loading) return <div className="loading-state"><div className="spinner" />Loading your trip…</div>;
+  if (!trip) return <section className="user-browse"><div className="browse-header"><div><span className="page-eyebrow">YOUR ITINERARY</span><h2>My Trip</h2><p>Create one personal trip plan for your visit.</p></div></div><div className="empty-state"><div className="empty-icon">🧳</div><h3>No trip yet</h3><p>Create your trip, then add places, hotels, and events from their pages.</p><button className="btn-primary" disabled={creating} onClick={makeTrip}>{creating ? "Creating…" : "Create My Trip"}</button></div></section>;
+
+  const itemCost = items.reduce((total, item) => total + Number(item.estimatedCost) * Number(item.quantity || 1), 0);
+  return <section className="user-browse"><div className="browse-header"><div><span className="page-eyebrow">YOUR ITINERARY</span><h2>{trip.name}</h2><p>{trip.destination} · {items.length} item(s)</p></div></div><div className="trip-summary"><div><span>Selected items</span><strong>Rs. {itemCost.toLocaleString()}</strong></div><label>Transport cost (Rs.)<input type="number" min="0" value={transportCost} onChange={(e) => setTransportCost(e.target.value)} onBlur={saveTransport} /></label><div><span>Total estimate</span><strong>Rs. {(itemCost + Number(transportCost || 0)).toLocaleString()}</strong></div></div>{items.length === 0 ? <div className="empty-state"><div className="empty-icon">📍</div><h3>Your trip is ready</h3><p>Go to Places, Hotels, or Events and add an item.</p></div> : <div className="trip-items">{items.map((item) => <article className="trip-row" key={item._id}><div><strong>{item.type}</strong><span>Rs. {Number(item.estimatedCost).toLocaleString()} × {item.quantity}</span></div><button className="btn-danger" onClick={() => removeItem(item._id)}>Remove</button></article>)}</div>}</section>;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    MAIN APP
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -580,6 +659,7 @@ function App() {
     { id: "places", label: "Places", icon: "📍" },
     { id: "hotels", label: "Hotels", icon: "🏨" },
     { id: "events", label: "Events", icon: "🎭" },
+    ...(!isAdmin ? [{ id: "trip", label: "My Trip", icon: "🧳" }] : []),
   ];
 
   const renderContent = () => {
@@ -657,6 +737,7 @@ function App() {
                       <span>Rs. {Number(item.estimatedCost).toLocaleString()}</span>
                       <span>{item.estimatedDuration}h</span>
                     </div>
+                    <AddToTripButton item={item} type="place" toast={toast} />
                   </div>
                 </article>
               )}
@@ -683,6 +764,7 @@ function App() {
                       <span>Rs. {Number(item.pricePerNight).toLocaleString()} / night</span>
                       <span>Rating: {item.rating != null ? item.rating : "New"}</span>
                     </div>
+                    <AddToTripButton item={item} type="hotel" toast={toast} />
                   </div>
                 </article>
               )}
@@ -710,11 +792,14 @@ function App() {
                       <span>{new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}</span>
                       <span>Rs. {Number(item.estimatedCost || 0).toLocaleString()}</span>
                     </div>
+                    <AddToTripButton item={item} type="event" toast={toast} />
                   </div>
                 </article>
               )}
             />
           );
+        case "trip":
+          return <MyTrip toast={toast} />;
         default:
           return null;
       }
