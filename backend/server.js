@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-
-const authRoutes = require("./routes/authRoutes");
+import placeRoutes from "./routes/placeRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 
@@ -18,6 +18,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/api/places", placeRoutes);
 
 app.get("/", (req, res) => {
   res.json({
