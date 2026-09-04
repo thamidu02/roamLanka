@@ -4,6 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import placeRoutes from "./routes/placeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import hotelRoutes from "./routes/hotelRoutes.js";
 
 dotenv.config();
 
@@ -18,7 +19,11 @@ app.use(
 );
 
 app.use(express.json());
+
+// Routes
 app.use("/api/places", placeRoutes);
+app.use("/api/hotels", hotelRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -32,9 +37,6 @@ app.get("/api/health", (req, res) => {
     message: "LankaExplore backend is healthy.",
   });
 });
-
-// Routes
-app.use("/api/auth", authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
