@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import eventRoutes from "./routes/eventRoutes.js";
 import placeRoutes from "./routes/placeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import hotelRoutes from "./routes/hotelRoutes.js";
@@ -21,6 +22,7 @@ app.use(
 
 app.use(express.json());
 
+app.use("/api/events", eventRoutes);
 // Routes
 app.use("/api/places", placeRoutes);
 app.use("/api/hotels", hotelRoutes);
